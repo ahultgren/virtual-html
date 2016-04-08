@@ -1,4 +1,5 @@
 var createVNode = require('virtual-dom/h');
+var createVSVGNode = require('virtual-dom/virtual-hyperscript/svg');
 var htmltree = require("htmltree");
 var camel = require('to-camel-case');
 
@@ -26,6 +27,7 @@ function vnode (parent) {
   if (parent.type == "text") return parent.data;
   if (parent.type != "tag") return;
 
+  var create = createVNode;
   var children;
   var child;
   var len;
@@ -50,10 +52,17 @@ function vnode (parent) {
     attributes.htmlFor = attributes['for'];
     delete attributes['for'];
   }
+  if(attributes.viewbox) attributes.viewBox = attributes.viewbox;
+  if(attributes.preserveaspectratio) attributes.preserveAspectRatio = attributes.preserveaspectratio;
 
   attributes.dataset = createDataSet(attributes);
 
-  return createVNode(parent.name, attributes, children);
+  // TODO: Check if svg-element. This is just a fulhack
+  if(parent.name === 'svg' || parent.name === 'polygon') {
+    create = createVSVGNode;
+  }
+
+  return create(parent.name, attributes, children);
 }
 
 function style (raw) {
