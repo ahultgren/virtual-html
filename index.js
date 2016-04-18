@@ -56,6 +56,7 @@ function vnode (parent) {
   if(attributes.preserveaspectratio) attributes.preserveAspectRatio = attributes.preserveaspectratio;
 
   attributes.dataset = createDataSet(attributes);
+  attributes.attributes = createDatasetAttributes(attributes);
 
   // TODO: Check if svg-element. This is just a fulhack
   if(parent.name === 'svg' || parent.name === 'polygon') {
@@ -94,4 +95,17 @@ function createDataSet (props) {
   }
 
   return dataset;
+}
+
+function createDatasetAttributes (properties) {
+  var attributes = properties.attributes || {};
+  var key;
+
+  for (key in properties) {
+    if (key.slice(0, 5) == 'data-') {
+      attributes[key] = properties[key];
+    }
+  }
+
+  return attributes;
 }
