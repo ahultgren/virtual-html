@@ -5,6 +5,21 @@ var camel = require('to-camel-case');
 
 module.exports = virtualHTML;
 
+function SrcHook (value) {
+  this.value = value;
+};
+SrcHook.prototype.hook = function (node, prop, prev) {
+  if(!prev) {
+    node[prop] = this.value;
+  }
+  if(prev && prev.value !== this.value) {
+    node[prop] = 'about:blank';
+    setTimeout(() => {
+      node[prop] = this.value;
+    }, 16);
+  }
+};
+
 function virtualHTML (html, callback) {
   callback = callback || defaultCb;
   if (typeof html == 'function') html = html();
@@ -61,6 +76,14 @@ function vnode (parent) {
   // TODO: Check if svg-element. This is just a fulhack
   if(parent.name === 'svg' || parent.name === 'polygon') {
     create = createVSVGNode;
+  }
+
+  if(parent.name === 'img') {
+    attributes.src = new SrcHook(attributes.src);
+  }
+
+  if(parent.name === 'source') {
+    attributes.srcset = new SrcHook(attributes.srcset);
   }
 
   return create(parent.name, attributes, children);
