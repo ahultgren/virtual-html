@@ -9,13 +9,15 @@ function SrcHook (value) {
   this.value = value;
 };
 SrcHook.prototype.hook = function (node, prop, prev) {
+  var self = this;
+
   if(!prev) {
-    node[prop] = this.value;
+    node[prop] = self.value;
   }
-  if(prev && prev.value !== this.value) {
+  if(prev && prev.value !== self.value) {
     node[prop] = 'about:blank';
-    setTimeout(() => {
-      node[prop] = this.value;
+    setTimeout(function () {
+      node[prop] = self.value;
     }, 16);
   }
 };
